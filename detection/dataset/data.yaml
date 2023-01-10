@@ -1,0 +1,37 @@
+names:
+- Printer3D_Body
+- Printer3D_Filament
+- BandSaw_Controls
+- BandSaw_Saw
+- BandSaw_WorkTable
+- Conveyors_BaseRoller
+- Conveyors_Bed
+- Conveyors_SlantRoller
+- Drillpress_Controls
+- Drillpress_Drill
+- Drillpress_HandWheel
+- Drillpress_MachineStand
+- Drillpress_WorkTable
+- Lathe_Bed
+- Lathe_ChipPan
+- Lathe_Controls
+- Lathe_CrossSlide
+- MillingMachine_ChipCollectorPlate
+- MillingMachine_Controls
+- MillingMachine_HandWheel
+- MillingMachine_MachineStand
+- MillingMachine_WorkTable
+- Robot_BaseArm
+- Robot_Head
+- Robot_UpperArm
+nc: 25
+roboflow:
+  license: CC BY 4.0
+  project: machine_detection
+  url: https://universe.roboflow.com/projecttest/machine_detection/dataset/1
+  version: 1
+  workspace: projecttest
+path: ../dataset/machine_detection-4
+test: ../test/
+train: ../train/
+val: ../valid/

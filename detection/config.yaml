@@ -1,0 +1,2 @@
+detection:
+  conf_thres: 0.25
