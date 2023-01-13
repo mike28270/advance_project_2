@@ -10,6 +10,7 @@ from owlready2 import get_ontology, onto_path
 
 import json
 
+
 class Labels:
     def __init__(self) -> None:
         pass
@@ -27,7 +28,6 @@ class Labels:
         data = model.names
         self.labels = self._extract_label(data.values())
         return self.labels
-
 
 class Ontology:
     def __init__(self, path: str, onto_name: str):
