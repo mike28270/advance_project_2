@@ -16,7 +16,7 @@ from detection.utils.augmentation import augment
 
 def readLabel_yolo(label_dir:str, class_names:List, label_file_ext:str="txt") -> pd.DataFrame:
     labels = sorted(Path(label_dir).glob(f"*.{label_file_ext}"))
-    df_list =[]
+    df_list = []
     for label in labels:
         columns = ["cat", "x", "y", "w", "h"]
         if os.stat(label).st_size != 0:
@@ -25,8 +25,10 @@ def readLabel_yolo(label_dir:str, class_names:List, label_file_ext:str="txt") ->
             df_temp = pd.DataFrame([[len(class_names), 0.1, 0.1, 0.1, 0.1]], columns=columns)
         df_temp["filename"] = label.stem
         df_list.append(df_temp)
-    df_label = pd.concat(df_list, axis=0, ignore_index=True)
-    return df_label[["filename", "x", "y", "w", "h", "cat"]]
+    if len(df_list) > 0:
+        df_label = pd.concat(df_list, axis=0, ignore_index=True)
+        df_label[["filename", "x", "y", "w", "h", "cat"]]
+    return df_label
 
 def copyClass(df, class_id, copies=1):
     df_nothing = df[df["cat"]==class_id]
@@ -34,6 +36,34 @@ def copyClass(df, class_id, copies=1):
     df_list.append(df)
     df = pd.concat(df_list, ignore_index=True)
     return df
+
+def split(
+    df_label:pd.DataFrame,
+    val_size = 0.2, 
+    test_size = 0.1, 
+    stratify:bool=True,
+    class_names:List=None,
+    label_file_ext:str="txt") -> dict:
+    assert (val_size+test_size) < 1, "The summation of validation and test size must less than 1."
+    # target_dir = Path(target_dir)
+    # df_label = readLabel_yolo(
+    #     label_dir=target_dir.joinpath("labels"), 
+    #     class_names=class_names, 
+    #     label_file_ext=label_file_ext)
+    X = df_label.drop("cat", axis=1)
+    y = df_label["cat"]
+    if stratify:
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, shuffle=True, random_state=42, stratify=y)
+        X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=val_size, shuffle=True, random_state=42, stratify=y_train)
+    else: 
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, shuffle=True, random_state=42)
+        X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=val_size, shuffle=True, random_state=42)
+    return {"X_train": X_train, 
+            "X_val": X_val, 
+            "X_test": X_test, 
+            "y_train": y_train, 
+            "y_val": y_val, 
+            "y_test": y_test}
 
 class Dataset:
     def __init__(
@@ -127,29 +157,4 @@ class Dataset:
             if all(value > limit for value in checking_cnt.values()):
                 pbar.close()
                 # break
-                return self.split(val_size = 0.2, test_size = 0.1, target_dir=target_dir, stratify=True)
-
-    def split(self, val_size = 0.2, test_size = 0.1, target_dir:Path=None, stratify=True) -> dict:
-        assert val_size+test_size < 1, "The summation of validation and test size must less than 1."
-        if target_dir is None:
-            target_dir = self.saved_dir
-        else:
-            target_dir = Path(target_dir)
-        df_lebel = readLabel_yolo(
-            label_dir=target_dir.joinpath("labels"), 
-            class_names=self.class_names, 
-            label_file_ext=self.label_file_ext)
-        X = df_lebel.drop("cat", axis=1)
-        y = df_lebel["cat"]
-        if stratify:
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, shuffle=True, random_state=42, stratify=y)
-            X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=val_size, shuffle=True, random_state=42, stratify=y_train)
-        else: 
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, shuffle=True, random_state=42)
-            X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=val_size, shuffle=True, random_state=42)
-        return {"X_train": X_train, 
-                "X_val": X_val, 
-                "X_test": X_test, 
-                "y_train": y_train, 
-                "y_val": y_val, 
-                "y_test": y_test}
+                return split(val_size = 0.2, test_size = 0.1, target_dir=target_dir, stratify=True)

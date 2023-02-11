@@ -11,7 +11,7 @@ def drawBox(
     labels:Union[List, np.ndarray]=None,
     font:int = cv2.FONT_HERSHEY_SIMPLEX,
     colors:List = list(mcolors.CSS4_COLORS.values()),
-    box_thickness:int = 2,
+    box_thickness:int = 3,
     text_thickness:int = 3,
     text_size:int = 3,
     targets_type:str = "abs:coco",
