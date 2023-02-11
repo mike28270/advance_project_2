@@ -7,7 +7,15 @@ import dash_bootstrap_components as dbc
 import json
 
 
+class saved:
+    def __init__(self) -> None:
+        self.selected_labels = []
+        self.selected_classes = []
+
+
 json_file = json.load(open("results/search.json"))
+db = saved
+
 # print(json_file.keys())
 # [print(label, list(zip(a_class.keys(),a_class.values()))) for label, a_class in json_file.items()]
 
@@ -24,10 +32,14 @@ def gen_dropdown(name, options):
                     dcc.Dropdown(
                         id=f"dropdown_{name}", 
                         options=options_list,
-                        # multi=True,
-                        value=1,
+                        multi=False,
+                        clearable=False,
+                        value=options_list[0],
+                        searchable=True,
                     ),
                 ])
+
+
 
 app = DjangoDash('importapp')   # replaces dash.Dash
 # app = DjangoDash(__name__)
@@ -52,30 +64,37 @@ app.layout = html.Div([
     ),
     html.Div(id="dropboxes"),
     html.Button('Submit', id='submit-val', n_clicks=0),
-    html.Div(id="container-button-basic")
+    html.Div(id="test_text"),
+    dcc.Store(id="labels")
 ])
 
 
 @app.callback(
-    [Output('container-button-basic', 'children'),
-     Output('dropboxes', 'children'),],
-    Input('score_theshold', 'value')
+    # [Output('test_text', 'children'),
+    #  Output('dropboxes', 'children'),],
+    Output("dropboxes", "children"),
+    Output("labels", "data"),
+    Input("score_theshold", "value"),
 )
 def select_theshold(score_theshold):
-    a_text = f"The input value was '{score_theshold}' and the button has been clicked times"
     a_dropbox = []
+    _label_list = []
     for label, a_class in json_file.items():
-        # print(list(a_class.values())[0])
-        if list(a_class.values())[0] >= float(score_theshold):
+        if list(a_class.values())[-1] >= float(score_theshold):
             a_dropbox.append(gen_dropdown(label, a_class))
-    return [a_text, a_dropbox]
+            _label_list.append(label)
+    return a_dropbox, _label_list
 
-# @app.callback(
-#     Output('container-button-basic', 'children'),
-#     State('dropboxes', 'value')
-# )
-# def select_classes(dropboxes):
-#     pass
+@app.callback(
+    Output("test_text", "children"),
+    Input("labels", "data")
+    # [Input(f"dropdown_{label}", "value") for label in list(Input('dropboxes', 'children'))]
+    # [Input(f"dropdown_{label}", "value") for label in db.selected_labels]
+)
+def select_classes(dropboxes_value):
+    print(dropboxes_value)
+    a_text = f"The input value was '{dropboxes_value}' and the button has been clicked times"
+    return a_text
 
 if __name__ == '__main__':
     app.run_server(debug=True)

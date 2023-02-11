@@ -1,37 +1,37 @@
 {
+    "Drillpress": {
+        "mason.Drilling": 0.5551064014434814,
+        "mason.Drill": 0.5074068307876587,
+        "mason.Machine-tool": 0.46587568521499634
+    },
+    "Printer3D": {
+        "mason.Plasma_trimming_machine": 0.27975884079933167,
+        "mason.Laser": 0.25432607531547546,
+        "mason.Machining_centre_5_axis": 0.24805979430675507
+    },
     "BandSaw": {
         "mason.Board_drop_hammer": 0.29878121614456177,
         "mason.Welding_aluminium": 0.29369494318962097,
         "mason.Shearing_machine-tool": 0.2744010090827942
-    },
-    "Conveyors": {
-        "mason.Hydroforming": 0.32675573229789734,
-        "mason.Manufacturing_concept": 0.3115306794643402,
-        "mason.Manual_moulding": 0.3105659484863281
     },
     "Robot": {
         "mason.Machine-tool": 0.3474141061306,
         "mason.Folding_machine": 0.3307335674762726,
         "mason.Grinding_machine": 0.3095781207084656
     },
-    "Drillpress": {
-        "mason.Drilling": 0.5551064014434814,
-        "mason.Drill": 0.5074068307876587,
-        "mason.Machine-tool": 0.46587568521499634
-    },
-    "Lathe": {
-        "mason.Lathe": 0.7013975381851196,
-        "mason.Extrusion": 0.4131752848625183,
-        "mason.Alloy": 0.4047287106513977
-    },
-    "3DPrinter": {
-        "mason.Moulding_machine": 0.2868301272392273,
-        "mason.Geometric_entity_for_manufacturing": 0.27900952100753784,
-        "mason.Painting_station": 0.2770738899707794
+    "Conveyors": {
+        "mason.Hydroforming": 0.32675573229789734,
+        "mason.Manufacturing_concept": 0.3115306794643402,
+        "mason.Manual_moulding": 0.3105659484863281
     },
     "MillingMachine": {
         "mason.Milling_machine": 0.7764980792999268,
         "mason.Milling_machine_4_axis": 0.7418296933174133,
         "mason.Milling": 0.7114167809486389
+    },
+    "Lathe": {
+        "mason.Lathe": 0.7013975381851196,
+        "mason.Extrusion": 0.4131752848625183,
+        "mason.Alloy": 0.4047287106513977
     }
 }

@@ -10,6 +10,8 @@ from owlready2 import get_ontology, onto_path
 
 import json
 
+import types
+
 
 class Labels:
     def __init__(self) -> None:
@@ -29,16 +31,22 @@ class Labels:
         self.labels = self._extract_label(data.values())
         return self.labels
 
+
 class Ontology:
-    def __init__(self, path: str, onto_name: str):
-        onto_path.append(path)
-        assert onto_name.endswith(".owl"), 'The file must be .owl'
-        self.onto = get_ontology(onto_name)
-        self.onto.load()
+    def __init__(self):
+        # a dict which keys are labels and values are classes
+        self.saved_label = {}
+        self.saved_class = {} 
 
     @property
     def get_onto(self):
         return self.onto
+
+    def set_onto(self, path: str, onto_name: str):
+        onto_path.append(path)
+        assert onto_name.endswith(".owl"), 'The file must be .owl'
+        self.onto = get_ontology(onto_name)
+        self.onto.load()
 
     def get_classnames(self):
         return [str(a_class) for a_class in self.onto.classes()]
@@ -71,6 +79,13 @@ class Ontology:
             with open(f"{save_path}/search.json", "w") as json_file:
                 json.dump(search_result, json_file, indent=4)
         return search_result
+    
+    def set_label_to_class(self, label, onto_class):
+        self.saved_class[label] = onto_class
+
+    def get_newclass(self, className, base):
+        self.onto.Thing #static value (root class)
+        types.new_class(className, (base,))
 
 
 if __name__ == "__main__":
