@@ -1,0 +1,19 @@
+names:
+- BandSaw
+- Conveyors
+- Drillpress
+- Lathe
+- MillingMachine
+- Printer3D
+- Robot
+nc: 7
+roboflow:
+  license: BY-NC-SA 4.0
+  project: machine_detection2
+  url: https://universe.roboflow.com/projecttest/machine_detection2/dataset/4
+  version: 4
+  workspace: projecttest
+path: ../dataset/machine_detection2-4
+test: ../test/
+train: ../train/
+val: ../valid/
