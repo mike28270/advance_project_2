@@ -17,8 +17,9 @@ def format_yolov5(targets: Union[List, np.ndarray], img: np.ndarray, label_pos: 
     targets = np.array(targets)
     if len(targets.shape) == 1:
         targets = targets.reshape(1,-1)
-    targets[:,1:5] = np.apply_along_axis(convert_whc2xy, axis=1, arr=targets[:,1:5])
-    targets[:,1:5] = np.apply_along_axis(convert_abs2rel, axis=1, arr=targets[:,1:5], img_w=img_w, img_h=img_h)
+    # targets[:,1:5] = np.apply_along_axis(convert_whc2xy, axis=1, arr=targets[:,1:5])
+    # targets[:,1:5] = np.apply_along_axis(convert_abs2rel, axis=1, arr=targets[:,1:5], img_w=img_w, img_h=img_h)
+    targets[:,1:5] = np.apply_along_axis(convert_whRatio_to_xy, axis=1, arr=targets[:,1:5], img_w=img_w, img_h=img_h)    
     ids = targets[:,label_pos].copy()
     bboxes = targets[:,1:5].copy()
     targets[:,0:4] = bboxes

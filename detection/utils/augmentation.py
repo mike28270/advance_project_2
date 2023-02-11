@@ -25,7 +25,7 @@ class image_augment:
 class augment:
     def __init__(
         self,
-        img_aug:List=[],
+        img_aug:List=image_augment.default,
         bbox_aug:A.BboxParams=None,
         bbox_format:str="yolo",
         resize:Union[List, Tuple]=(640, 640),
@@ -34,7 +34,10 @@ class augment:
         bbox_format_choice = ["coco", "pascal_voc", "albumentations", "yolo"]
         assert bbox_format in bbox_format_choice, f"bbox_format must be one of this {bbox_format_choice}."
         if len(img_aug) == 0:
-            img_aug = image_augment.default
+            img_aug = [
+                A.HorizontalFlip(p=1),
+                A.HorizontalFlip(p=1),
+            ]
         if bbox_aug is None:
             bbox_aug = A.BboxParams(format=bbox_format, min_area=1024, min_visibility=0.1)
         if resize:

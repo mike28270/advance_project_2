@@ -28,6 +28,13 @@ def readLabel_yolo(label_dir:str, class_names:List, label_file_ext:str="txt") ->
     df_label = pd.concat(df_list, axis=0, ignore_index=True)
     return df_label[["filename", "x", "y", "w", "h", "cat"]]
 
+def copyClass(df, class_id, copies=1):
+    df_nothing = df[df["cat"]==class_id]
+    df_list = [df_nothing for i in range(copies)]
+    df_list.append(df)
+    df = pd.concat(df_list, ignore_index=True)
+    return df
+
 class Dataset:
     def __init__(
         self,
@@ -38,6 +45,7 @@ class Dataset:
         image_file_ext:str = "JPG",
         label_file_ext:str = "txt",
         label_format:str = "abs:yolo",
+        resize:Union[List, Tuple]=(640, 640),
         ) -> None:
         self.data = yaml.load(open(Path(data_path)), Loader=yaml.SafeLoader)
         self.class_names = self.data["names"]
@@ -55,14 +63,15 @@ class Dataset:
         self.image_file_ext = image_file_ext
         self.label_file_ext = label_file_ext
         self.label_format = label_format
+        self.resize = resize
 
-    def copy_org(self, resize:Union[None, List]=None) -> bool:
+    def copy_org(self) -> bool:
         image_paths = list(self.image_dir.glob(f"*.{self.image_file_ext}"))
         for image_path in tqdm(image_paths, total=len(image_paths)):
             filename = image_path.stem
             img = np.array(PImage.open(image_path))
             bboxes = self.arr_label[np.where(self.arr_label[:,0] == filename)][:,1:]
-            aug = augment(resize=resize)
+            aug = augment(img_aug=[], bbox_aug=None, resize=self.resize)
             aug.process(img, bboxes, self.class_names)
             aug.saved(saved_dir=self.saved_dir, filename_org=filename)
 
@@ -89,12 +98,11 @@ class Dataset:
             bboxes = self.arr_label[np.where(self.arr_label[:,0] == filename)][:,1:]
 
             # Transform the image
-            aug = augment()
+            aug = augment(bbox_aug=None, resize=self.resize)
             transformed = aug.process(img, bboxes, self.class_names)
             # aug.saved(saved_dir="detection/dataset/machine_preprocessed/whole", filename_org=filename)
 
             # Add filename to the transformed result: [x, y, w, h, cat] -> [filename, x, y, w, h, cat]
-            dtype = "|S10, f, f, f, f, f"
             if transformed["bboxes"]:
                 # Use pd.DataFrame to deal with np.dtype problem
                 bboxes_new = pd.DataFrame([[filename]]*len(transformed["bboxes"]), columns=["filename"])
@@ -118,4 +126,30 @@ class Dataset:
             ## Break if all class exceed the limit
             if all(value > limit for value in checking_cnt.values()):
                 pbar.close()
-                break
+                # break
+                return self.split(val_size = 0.2, test_size = 0.1, target_dir=target_dir, stratify=True)
+
+    def split(self, val_size = 0.2, test_size = 0.1, target_dir:Path=None, stratify=True) -> dict:
+        assert val_size+test_size < 1, "The summation of validation and test size must less than 1."
+        if target_dir is None:
+            target_dir = self.saved_dir
+        else:
+            target_dir = Path(target_dir)
+        df_lebel = readLabel_yolo(
+            label_dir=target_dir.joinpath("labels"), 
+            class_names=self.class_names, 
+            label_file_ext=self.label_file_ext)
+        X = df_lebel.drop("cat", axis=1)
+        y = df_lebel["cat"]
+        if stratify:
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, shuffle=True, random_state=42, stratify=y)
+            X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=val_size, shuffle=True, random_state=42, stratify=y_train)
+        else: 
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, shuffle=True, random_state=42)
+            X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=val_size, shuffle=True, random_state=42)
+        return {"X_train": X_train, 
+                "X_val": X_val, 
+                "X_test": X_test, 
+                "y_train": y_train, 
+                "y_val": y_val, 
+                "y_test": y_test}
