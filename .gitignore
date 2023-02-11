@@ -1,0 +1,6 @@
+*.DS_Store
+*.JPG
+*.jpg
+*.pt
+*.sqlite3
+*.pyc
