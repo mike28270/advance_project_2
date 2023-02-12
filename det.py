@@ -1,4 +1,4 @@
-from detection.yolov5.detect import run as det
+from detection.utils.inference import run as inference
 from ontology.utils.ontology import Ontology, Labels
 import json
 
@@ -17,7 +17,7 @@ def process(
     save_json=True,
     exist_ok=True):
 
-    model = det(
+    model = inference(
         weights=weights,
         data=data,
         source=source,
